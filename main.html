@@ -36,61 +36,72 @@
 
 <script>
 //Your code goes here 
-	 const container = document.querySelector('.items');
-  const items = document.querySelectorAll('.item');
+	 // Select container and all cubes
+const container = document.querySelector('.items');
+const cubes = document.querySelectorAll('.item');
 
-  let selectedItem = null;
-  let offsetX = 0, offsetY = 0;
+let selectedCube = null;
+let offsetX = 0, offsetY = 0;
 
+// Initialize cubes: absolute positioning and grid placement
+cubes.forEach((cube, i) => {
+  cube.style.position = "absolute";  // needed for free movement
+  cube.style.width = "100px";
+  cube.style.height = "100px";
+  cube.style.fontSize = "24px";
+  cube.style.color = "white";
+  cube.style.display = "flex";
+  cube.style.alignItems = "center";
+  cube.style.justifyContent = "center";
+  cube.style.cursor = "grab";
 
-  items.forEach((item, i) => {
-    item.style.position = "absolute";
-    item.style.width = "100px";
-    item.style.height = "100px";
-    item.style.lineHeight = "100px";
-    item.style.textAlign = "center";
-    item.style.color = "white";
-    item.style.fontWeight = "bold";
+  // Place in grid (5 per row)
+  const cols = 5;
+  const gap = 20;
+  const size = 100;
+  const col = i % cols;
+  const row = Math.floor(i / cols);
 
-    
-    const cols = 5;
-    const gap = 10;
-    const size = 100;
+  cube.style.left = `${gap + col * (size + gap)}px`;
+  cube.style.top = `${gap + row * (size + gap)}px`;
 
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-
-    item.style.left = `${gap + col * (size + gap)}px`;
-    item.style.top = `${gap + row * (size + gap)}px`;
-
-    item.addEventListener('mousedown', (e) => {
-      selectedItem = item;
-      const rect = item.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-    });
+  // Handle drag start
+  cube.addEventListener('mousedown', (e) => {
+    selectedCube = cube;
+    const rect = cube.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    cube.style.cursor = "grabbing";
   });
+});
 
-  document.addEventListener('mousemove', (e) => {
-    if (!selectedItem) return;
+// Handle drag move
+document.addEventListener('mousemove', (e) => {
+  if (!selectedCube) return;
 
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = selectedItem.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const cubeRect = selectedCube.getBoundingClientRect();
 
-    
-    let newLeft = e.clientX - containerRect.left - offsetX;
-    let newTop = e.clientY - containerRect.top - offsetY;
+  // new position relative to container
+  let newLeft = e.clientX - containerRect.left - offsetX;
+  let newTop = e.clientY - containerRect.top - offsetY;
 
-    newLeft = Math.max(0, Math.min(newLeft, containerRect.width - itemRect.width));
-    newTop = Math.max(0, Math.min(newTop, containerRect.height - itemRect.height));
+  // enforce boundaries
+  newLeft = Math.max(0, Math.min(newLeft, containerRect.width - cubeRect.width));
+  newTop = Math.max(0, Math.min(newTop, containerRect.height - cubeRect.height));
 
-    selectedItem.style.left = `${newLeft}px`;
-    selectedItem.style.top = `${newTop}px`;
-  });
+  selectedCube.style.left = `${newLeft}px`;
+  selectedCube.style.top = `${newTop}px`;
+});
 
-  document.addEventListener('mouseup', () => {
-    selectedItem = null;
-  });
+// Handle drag end
+document.addEventListener('mouseup', () => {
+  if (selectedCube) {
+    selectedCube.style.cursor = "grab";
+    selectedCube = null;
+  }
+});
+
 </script>
 
   </body>
